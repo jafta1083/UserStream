@@ -1,0 +1,165 @@
+version: '3.8'
+
+services:
+  # Message Queue - RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: userstream-rabbitmq
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - userstream-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Database - PostgreSQL
+  postgres:
+    image: postgres:14
+    container_name: userstream-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: userstream
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - userstream-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Service 1: Frontend
+  frontend:
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile
+    container_name: userstream-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://queue-receiver:8081
+      - REACT_APP_QUEUE_URL=amqp://rabbitmq:5672
+    depends_on:
+      - rabbitmq
+    networks:
+      - userstream-network
+    restart: unless-stopped
+
+  # Service 2: Queue Receiver
+  queue-receiver:
+    build:
+      context: ./services/queue-receiver
+      dockerfile: Dockerfile
+    container_name: userstream-queue-receiver
+    ports:
+      - "8081:8081"
+    environment:
+      - QUEUE_URL=amqp://admin:admin123@rabbitmq:5672
+      - QUEUE_NAME=user.registration
+      - DATABASE_SERVICE_URL=http://database-service:8083
+      - SENDER_SERVICE_URL=http://sender:8082
+      - MAX_RETRY_ATTEMPTS=3
+      - RETRY_DELAY_MS=5000
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database-service:
+        condition: service_started
+      sender:
+        condition: service_started
+    networks:
+      - userstream-network
+    restart: unless-stopped
+
+  # Service 3: Sender (Email Notification Service)
+  sender:
+    build:
+      context: ./services/sender
+      dockerfile: Dockerfile
+    container_name: userstream-sender
+    ports:
+      - "8082:8082"
+    environment:
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=false
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - FROM_EMAIL=${FROM_EMAIL:-noreply@userstream.com}
+      - FROM_NAME=UserStream
+      - MAX_RETRY_ATTEMPTS=3
+    networks:
+      - userstream-network
+    restart: unless-stopped
+
+  # Service 4: Database Service
+  database-service:
+    build:
+      context: ./services/database-service
+      dockerfile: Dockerfile
+    container_name: userstream-database-service
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=userstream
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres123
+      - DB_POOL_MIN=2
+      - DB_POOL_MAX=10
+      - PORT=8083
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - userstream-network
+    restart: unless-stopped
+
+  # Service 5: Report Generator (CSV Export Service)
+  report-generator:
+    build:
+      context: ./services/report-generator
+      dockerfile: Dockerfile
+    container_name: userstream-report-generator
+    ports:
+      - "8084:8084"
+    environment:
+      - DATABASE_SERVICE_URL=http://database-service:8083
+      - REPORT_OUTPUT_DIR=/reports
+      - CSV_DELIMITER=,
+      - INCLUDE_HEADER=true
+      - MAX_RECORDS_PER_FILE=50000
+      - ENABLE_COMPRESSION=true
+      - RETENTION_DAYS=30
+      - PORT=8084
+    volumes:
+      - reports_data:/reports
+    depends_on:
+      - database-service
+    networks:
+      - userstream-network
+    restart: unless-stopped
+
+networks:
+  userstream-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  postgres_data:
+  reports_data:
