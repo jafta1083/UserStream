@@ -120,6 +120,8 @@ docker run -p 8081:8081 userstream-queue-receiver
 }
 ```
 
+**Note:** The `timestamp` field is automatically added by the Frontend service when the message is published to the queue. It represents when the user submitted the registration form.
+
 ## Error Handling
 
 ### Retry Strategy

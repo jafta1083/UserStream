@@ -11,11 +11,11 @@ The Sender Service handles all notification and communication tasks, primarily s
 - Handles notification failures and retries
 
 ## Technology Stack
-- **Runtime:** Node.js / Java / Python
-- **Framework:** Express.js / Spring Boot / Flask
-- **Email Library:** Nodemailer / JavaMail / smtplib
-- **Template Engine:** Handlebars / Thymeleaf / Jinja2
-- **Logging:** Winston / Log4j / Python logging
+- **Runtime:** Node.js (v14 or higher)
+- **Framework:** Express.js
+- **Email Library:** Nodemailer
+- **Template Engine:** Handlebars
+- **Logging:** Winston
 
 ## Features
 - Email template management
