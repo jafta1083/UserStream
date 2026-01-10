@@ -1,0 +1,4 @@
+com\userstream\repository\InMemoryUserRepository.class
+com\userstream\repository\UserRepository.class
+com\userstream\user\UserData.class
+com\userstream\service\UserService.class

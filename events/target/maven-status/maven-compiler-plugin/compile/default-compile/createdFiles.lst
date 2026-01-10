@@ -1,0 +1,4 @@
+com\userstream\events\Memory_DB.class
+com\userstream\events\EventRepository.class
+com\userstream\events\Event.class
+com\userstream\events\EventService.class

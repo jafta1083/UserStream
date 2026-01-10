@@ -1,0 +1,8 @@
+com\userstream\web\ReportController.class
+com\userstream\web\request\InMemoryWebRequestRepository.class
+com\userstream\web\UserController.class
+com\userstream\web\request\WebRequestRepository.class
+com\userstream\web\App.class
+com\userstream\web\request\WebRequest.class
+com\userstream\web\UserHandler.class
+com\userstream\web\service\WebService.class

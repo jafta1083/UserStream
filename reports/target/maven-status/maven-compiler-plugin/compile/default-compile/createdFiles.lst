@@ -1,0 +1,5 @@
+com\userstream\reports\Report.class
+com\userstream\reports\ReportRepository.class
+com\userstream\reports\ReportsDB.class
+com\userstream\service\UserReport.class
+com\userstream\service\ReportService.class
