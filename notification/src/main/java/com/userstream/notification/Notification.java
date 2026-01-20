@@ -3,8 +3,8 @@ package com.userstream.notification;
 import java.time.LocalDateTime;
 
 public class Notification {
-    private String id;
-    private String userId;
+    private int id;
+    private int userId;
     private String title;
     private String content;
     private String channel; // EMAIL, SMS, PUSH
@@ -15,7 +15,7 @@ public class Notification {
     public Notification() {
     }
 
-    public Notification(String id, String userId, String title, String content, String channel) {
+    public Notification(int id, int userId, String title, String content, String channel) {
         this.id = id;
         this.userId = userId;
         this.title = title;
@@ -26,19 +26,19 @@ public class Notification {
     }
 
     // Getters and Setters
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

@@ -1,4 +1,4 @@
-package com.userstream.web;
+package com.userstream.web.manager;
 
 import com.userstream.repository.UserRepository;
 import com.userstream.user.UserData;
@@ -18,7 +18,7 @@ public class UserHandler {
     public void createUser(Context ctx) {
         UserData request = ctx.bodyAsClass(UserData.class);
 
-        request.setId(UUID.randomUUID().toString());
+        request.setId(Integer.parseInt(UUID.randomUUID().toString()));
         repository.save(request);
 
         ctx.status(201);
@@ -32,7 +32,7 @@ public class UserHandler {
 
     // GET /users/{id}
     public void getUserById(Context ctx) {
-        String id = ctx.pathParam("id");
+        int id = Integer.parseInt(ctx.pathParam("id"));
 
         repository.findById(id)
                 .ifPresentOrElse(

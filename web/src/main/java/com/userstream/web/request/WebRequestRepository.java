@@ -6,9 +6,9 @@ import java.util.Optional;
 public interface WebRequestRepository {
     void save(WebRequest request);
 
-    Optional<WebRequest> findById(String id);
+    Optional<WebRequest> findById(int id);
 
     List<WebRequest> findAll();
 
-    void delete(String id);
+    void delete(int id);
 }

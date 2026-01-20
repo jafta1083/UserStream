@@ -1,32 +1,16 @@
 package com.userstream.notification;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class NotificationRepository {
-    private final ConcurrentHashMap<String, Notification> notifications = new ConcurrentHashMap<>();
+public interface NotificationRepository {
+    void save(Notification notification);
 
-    public void save(Notification notification) {
-        notifications.put(notification.getId(), notification);
-    }
+    Optional<Notification> findById(int id);
 
-    public Optional<Notification> findById(String id) {
-        return Optional.ofNullable(notifications.get(id));
-    }
+    List<Notification> findAll();
 
-    public List<Notification> findAll() {
-        return new ArrayList<>(notifications.values());
-    }
+    List<Notification> findByUserId(int userId);
 
-    public List<Notification> findByUserId(String userId) {
-        return notifications.values().stream()
-                .filter(n -> n.getUserId().equals(userId))
-                .toList();
-    }
-
-    public void delete(String id) {
-        notifications.remove(id);
-    }
+    void delete(int id);
 }

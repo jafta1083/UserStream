@@ -42,7 +42,7 @@ public class WebService {
 
         // GET request by ID
         app.get("/requests/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("Request not found")
@@ -58,7 +58,7 @@ public class WebService {
 
         // DELETE request
         app.delete("/requests/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
             repository.delete(id);
             ctx.status(204);
         });

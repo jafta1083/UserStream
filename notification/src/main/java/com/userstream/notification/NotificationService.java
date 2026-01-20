@@ -28,7 +28,7 @@ public class NotificationService {
     }
 
     private Javalin initHttpServer() {
-        NotificationRepository repository = new NotificationRepository();
+        InMemoryUserRepository repository = new InMemoryUserRepository();
 
         Javalin app = Javalin.create();
 
@@ -45,7 +45,8 @@ public class NotificationService {
         });
 
         app.get("/notifications/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("Notification not found")
@@ -53,7 +54,9 @@ public class NotificationService {
         });
 
         app.post("/notifications/{id}/send", ctx -> {
-            String id = ctx.pathParam("id");
+
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     notification -> {
                         notification.setStatus("SENT");

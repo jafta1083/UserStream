@@ -1,7 +1,7 @@
 package com.userstream.events;
 
 public class Event {
-    private String id;
+    private int id;
     private String type;
     private String data;
     private long timestamp;
@@ -10,18 +10,18 @@ public class Event {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public Event(String id, String type, String data) {
+    public Event(int id, String type, String data) {
         this.id = id;
         this.type = type;
         this.data = data;
         this.timestamp = System.currentTimeMillis();
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -1,0 +1,4 @@
+id,name,surname,email,createdAt,active
+c9deb8f4-972f-4aa9-b133-8cc2067daf5c,Alice Johnson,Johnson,alice@example.com,2026-01-10T16:53:08.1068254,true
+de1e4151-3242-49d9-babd-2c446a87319c,Alice Johnson,Johnson,alice@example.com,2026-01-10T16:53:16.7543501,true
+615cd103-bbeb-497c-ad3c-1e9e1d1ea389,Bob Smith,Smith,bob@example.com,2026-01-10T16:53:46.0255321,true

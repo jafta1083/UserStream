@@ -1,4 +1,0 @@
-com\userstream\alert\AlertService.class
-com\userstream\alert\InMemoryAlertRepository.class
-com\userstream\alert\AlertRepository.class
-com\userstream\alert\Alert.class

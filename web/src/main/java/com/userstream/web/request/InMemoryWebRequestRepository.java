@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class InMemoryWebRequestRepository implements WebRequestRepository {
-    private final Map<String, WebRequest> requests = new ConcurrentHashMap<>();
+    private final Map<Integer, WebRequest> requests = new ConcurrentHashMap<>();
 
     @Override
     public void save(WebRequest request) {
@@ -15,7 +15,7 @@ public class InMemoryWebRequestRepository implements WebRequestRepository {
     }
 
     @Override
-    public Optional<WebRequest> findById(String id) {
+    public Optional<WebRequest> findById(int id) {
         return Optional.ofNullable(requests.get(id));
     }
 
@@ -25,7 +25,7 @@ public class InMemoryWebRequestRepository implements WebRequestRepository {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(int id) {
         requests.remove(id);
     }
 }

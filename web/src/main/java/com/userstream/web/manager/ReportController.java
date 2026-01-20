@@ -1,4 +1,4 @@
-package com.userstream.web;
+package com.userstream.web.manager;
 
 import com.userstream.common.ApiResponse;
 import io.javalin.Javalin;

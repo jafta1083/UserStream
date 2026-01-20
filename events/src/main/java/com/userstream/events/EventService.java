@@ -8,7 +8,7 @@ public class EventService {
 
     private static final int DEFAULT_PORT = 7002;
     private Javalin server;
-    private Memory_DB repository;
+    private InMemoryUserRepository repository;
 
     public static void main(String[] args) {
         EventService eventService = new EventService();
@@ -45,7 +45,8 @@ public class EventService {
         });
 
         app.get("/events/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+            
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("Event not found")

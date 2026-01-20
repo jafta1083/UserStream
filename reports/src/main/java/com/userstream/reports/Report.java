@@ -1,7 +1,7 @@
 package com.userstream.reports;
 
 public class Report {
-    private String id;
+    private int id;
     private String name;
     private String format;
     private String data;
@@ -11,7 +11,7 @@ public class Report {
         this.createdAt = System.currentTimeMillis();
     }
 
-    public Report(String id, String name, String format, String data) {
+    public Report(int id, String name, String format, String data) {
         this.id = id;
         this.name = name;
         this.format = format;
@@ -19,11 +19,11 @@ public class Report {
         this.createdAt = System.currentTimeMillis();
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

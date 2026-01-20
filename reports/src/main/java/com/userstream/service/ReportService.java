@@ -1,7 +1,7 @@
 package com.userstream.service;
 
 import com.userstream.reports.Report;
-import com.userstream.reports.ReportsDB;
+import com.userstream.reports.InMemoryUserRepository;
 import io.javalin.Javalin;
 
 import java.util.List;
@@ -10,7 +10,7 @@ public class ReportService {
 
     private static final int DEFAULT_PORT = 7003;
     private Javalin server;
-    private ReportsDB repository;
+    private InMemoryUserRepository repository;
 
     public static void main(String[] args) {
         ReportService reportService = new ReportService();
@@ -42,7 +42,9 @@ public class ReportService {
 
         // GET report by ID
         app.get("/reports/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("Report not found")

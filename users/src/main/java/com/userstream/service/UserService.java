@@ -1,13 +1,16 @@
 package com.userstream.service;
 
+import com.userstream.db.DatabaseConfig;
 import com.userstream.repository.InMemoryUserRepository;
 import com.userstream.user.UserData;
 import io.javalin.Javalin;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class UserService {
 
+    private static Logger logger = Logger.getLogger("");
     private static final int DEFAULT_PORT = 7001;
     private Javalin server;
 
@@ -42,7 +45,8 @@ public class UserService {
 
         // GET user by ID
         app.get("/users/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("User not found")
@@ -58,7 +62,7 @@ public class UserService {
 
         // PUT update user
         app.put("/users/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
             UserData updatedUser = ctx.bodyAsClass(UserData.class);
             updatedUser.setId(id);
             repository.save(updatedUser);
@@ -67,7 +71,7 @@ public class UserService {
 
         // DELETE user
         app.delete("/users/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
             boolean deleted = repository.deleteById(id);
             if (deleted) {
                 ctx.status(204);
