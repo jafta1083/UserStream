@@ -7,6 +7,7 @@ import java.util.List;
 public class AlertService {
 
     private static final int DEFAULT_PORT = 7005;
+    private InMemoryAlertRepository repository;
     private Javalin server;
 
     public static void main(String[] args) {
@@ -28,7 +29,6 @@ public class AlertService {
     }
 
     private Javalin initHttpServer() {
-        InMemoryAlertRepository repository = new InMemoryAlertRepository();
 
         Javalin app = Javalin.create();
 
@@ -56,14 +56,16 @@ public class AlertService {
 
         // GET alerts by user ID
         app.get("/alerts/user/{userId}", ctx -> {
-            String userId = ctx.pathParam("userId");
+            int userId = Integer.parseInt(ctx.pathParam("id"));
+
             List<Alert> alerts = repository.findByUserId(userId);
             ctx.json(alerts);
         });
 
         // POST mark alert as read
         app.post("/alerts/{id}/read", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     alert -> {
                         alert.setRead(true);
@@ -76,7 +78,8 @@ public class AlertService {
 
         // DELETE alert
         app.delete("/alerts/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.deleteById(id);
             ctx.status(204);
         });

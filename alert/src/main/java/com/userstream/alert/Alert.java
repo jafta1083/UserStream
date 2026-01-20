@@ -3,8 +3,8 @@ package com.userstream.alert;
 import java.time.LocalDateTime;
 
 public class Alert {
-    private String id;
-    private String userId;
+    private int id;
+    private int userId;
     private String message;
     private String type;
     private LocalDateTime createdAt;
@@ -13,7 +13,7 @@ public class Alert {
     public Alert() {
     }
 
-    public Alert(String id, String userId, String message, String type) {
+    public Alert(int id, int userId, String message, String type) {
         this.id = id;
         this.userId = userId;
         this.message = message;
@@ -22,19 +22,19 @@ public class Alert {
         this.read = false;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

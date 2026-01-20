@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class InMemoryAlertRepository implements AlertRepository {
-    private final Map<String, Alert> alerts = new ConcurrentHashMap<>();
+public abstract class InMemoryAlertRepository implements AlertRepository {
+    private final Map<Integer, Alert> alerts = new ConcurrentHashMap<>();
 
     @Override
     public Alert save(Alert alert) {
@@ -22,26 +22,26 @@ public class InMemoryAlertRepository implements AlertRepository {
     }
 
     @Override
-    public List<Alert> findByUserId(String userId) {
+    public List<Alert> findByUserId(int userId) {
         return alerts.values().stream()
-                .filter(alert -> userId.equals(alert.getUserId()))
+                .filter(alert -> alert.getUserId() == userId)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Alert> findUnreadByUserId(String userId) {
+    public List<Alert> findUnreadByUserId(int userId) {
         return alerts.values().stream()
-                .filter(alert -> userId.equals(alert.getUserId()) && !alert.isRead())
+                .filter(alert -> alert.getUserId() == userId && !alert.isRead())
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteById(String id) {
-        alerts.remove(id);
     }
 
     @Override
     public List<Alert> findAll() {
         return new ArrayList<>(alerts.values());
+    }
+
+    @Override
+    public void deleteById(int id) {
+        alerts.remove(id);
     }
 }
