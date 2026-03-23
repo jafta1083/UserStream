@@ -18,7 +18,7 @@ public class UserHandler {
     public void createUser(Context ctx) {
         UserData request = ctx.bodyAsClass(UserData.class);
 
-        request.setId(Integer.parseInt(UUID.randomUUID().toString()));
+        request.setId(UUID.randomUUID().toString());
         repository.save(request);
 
         ctx.status(201);
@@ -32,7 +32,7 @@ public class UserHandler {
 
     // GET /users/{id}
     public void getUserById(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
+        String id = ctx.pathParam("id");
 
         repository.findById(id)
                 .ifPresentOrElse(

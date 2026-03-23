@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
 public class InMemoryUserRepository implements UserRepository {
-    private final Map<Integer, UserData> users = new ConcurrentHashMap<>();
+    private final Map<String, UserData> users = new ConcurrentHashMap<>();
 
     @Override
     public UserData save(UserData user) {
@@ -18,7 +18,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<UserData> findById(int id) {
+    public Optional<UserData> findById(String id) {
         return Optional.ofNullable(users.get(id));
     }
 
@@ -42,7 +42,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     }
 
-    public boolean deleteById(int id) {
+    public boolean deleteById(String id) {
         return users.remove(id) != null;
     }
 }

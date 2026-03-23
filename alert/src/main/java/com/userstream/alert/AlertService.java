@@ -7,7 +7,7 @@ import java.util.List;
 public class AlertService {
 
     private static final int DEFAULT_PORT = 7005;
-    private InMemoryAlertRepository repository;
+    private final InMemoryAlertRepository repository = new InMemoryAlertRepository();
     private Javalin server;
 
     public static void main(String[] args) {
@@ -32,15 +32,38 @@ public class AlertService {
 
         Javalin app = Javalin.create();
 
+//        undone checking the UnreadUserID
+// GET unread alerts by user ID
+    app.get("/alerts/user/{userId}/unread", ctx -> {
+        int userId = Integer.parseInt(ctx.pathParam("userId"));
+        List<Alert> unreadAlerts = repository.findByUserId(userId).stream()
+            .filter(alert -> !alert.isRead())
+            .toList();
+        ctx.json(unreadAlerts);
+    });
+
+    // POST mark all alerts as read for a user
+    app.post("/alerts/user/{userId}/read", ctx -> {
+        int userId = Integer.parseInt(ctx.pathParam("userId"));
+        List<Alert> userAlerts = repository.findByUserId(userId);
+        userAlerts.forEach(alert -> {
+        alert.setRead(true);
+        repository.save(alert);
+        });
+        ctx.json(userAlerts);
+    });
+
         // GET all alerts
         app.get("/alerts", ctx -> {
             List<Alert> alerts = repository.findAll();
+
             ctx.json(alerts);
         });
 
         // GET alert by ID
         app.get("/alerts/{id}", ctx -> {
-            String id = ctx.pathParam("id");
+            int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("Alert not found")
@@ -56,7 +79,7 @@ public class AlertService {
 
         // GET alerts by user ID
         app.get("/alerts/user/{userId}", ctx -> {
-            int userId = Integer.parseInt(ctx.pathParam("id"));
+            int userId = Integer.parseInt(ctx.pathParam("userId"));
 
             List<Alert> alerts = repository.findByUserId(userId);
             ctx.json(alerts);

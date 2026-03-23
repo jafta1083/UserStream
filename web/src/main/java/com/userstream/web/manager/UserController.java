@@ -36,7 +36,7 @@ public class UserController {
         }
 
         // Set user properties
-        user.setId(Integer.parseInt(UUID.randomUUID().toString()));
+        user.setId(UUID.randomUUID().toString());
         user.setCreatedAt(LocalDateTime.now());
         user.setActive(true);
 

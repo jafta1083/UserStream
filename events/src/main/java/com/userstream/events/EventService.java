@@ -8,7 +8,7 @@ public class EventService {
 
     private static final int DEFAULT_PORT = 7002;
     private Javalin server;
-    private InMemoryUserRepository repository;
+    private final InMemoryEventRepository repository = new InMemoryEventRepository();
 
     public static void main(String[] args) {
         EventService eventService = new EventService();

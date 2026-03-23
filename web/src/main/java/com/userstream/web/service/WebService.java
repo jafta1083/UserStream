@@ -1,5 +1,6 @@
 package com.userstream.web.service;
 
+import com.userstream.web.request.InMemoryWebRequestRepository;
 import com.userstream.web.request.WebRequest;
 import com.userstream.web.request.WebRequestRepository;
 import io.javalin.Javalin;
@@ -9,6 +10,7 @@ import java.util.List;
 public class WebService {
 
     private static final int DEFAULT_PORT = 7000;
+    private final WebRequestRepository repository = new InMemoryWebRequestRepository();
     private Javalin server;
 
     public static void main(String[] args) {
@@ -30,7 +32,6 @@ public class WebService {
     }
 
     private Javalin initHttpServer() {
-        WebRequestRepository repository = new com.userstream.web.request.InMemoryWebRequestRepository();
 
         Javalin app = Javalin.create();
 
@@ -43,9 +44,11 @@ public class WebService {
         // GET request by ID
         app.get("/requests/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
                     () -> ctx.status(404).result("Request not found")
+
             );
         });
 
@@ -59,6 +62,7 @@ public class WebService {
         // DELETE request
         app.delete("/requests/{id}", ctx -> {
             int id = Integer.parseInt(ctx.pathParam("id"));
+
             repository.delete(id);
             ctx.status(204);
         });

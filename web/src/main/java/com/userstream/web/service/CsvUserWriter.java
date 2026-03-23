@@ -59,7 +59,7 @@ public class CsvUserWriter {
     private String formatUserAsCsv(UserData user) {
         StringBuilder sb = new StringBuilder();
         
-        sb.append(escapeCsvField(user.getId())).append(",");
+        sb.append(escapeCsvField(String.valueOf(user.getId()))).append(",");
         sb.append(escapeCsvField(user.getName())).append(",");
         sb.append(escapeCsvField(user.getSurname())).append(",");
         sb.append(escapeCsvField(user.getEmail())).append(",");

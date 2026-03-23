@@ -9,7 +9,7 @@ public interface MQ {
 
     static final String PASSAWD = "admin";
 
-    static final String PERSONAL_DETAILS_TOPIC = "personal_details";
+    static final String PERSONAL_DETAILS_TOPIC = "username";
 
     static final String ALERT_QUEUE = "alert";
 

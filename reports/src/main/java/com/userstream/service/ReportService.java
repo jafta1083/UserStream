@@ -1,7 +1,7 @@
 package com.userstream.service;
 
 import com.userstream.reports.Report;
-import com.userstream.reports.InMemoryUserRepository;
+import com.userstream.reports.InMemoryReportRepository;
 import io.javalin.Javalin;
 
 import java.util.List;
@@ -10,7 +10,7 @@ public class ReportService {
 
     private static final int DEFAULT_PORT = 7003;
     private Javalin server;
-    private InMemoryUserRepository repository;
+    private final InMemoryReportRepository repository = new InMemoryReportRepository();
 
     public static void main(String[] args) {
         ReportService reportService = new ReportService();

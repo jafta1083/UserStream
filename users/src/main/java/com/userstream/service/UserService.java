@@ -10,8 +10,8 @@ import java.util.logging.Logger;
 
 public class UserService {
 
-    private static Logger logger = Logger.getLogger("");
     private static final int DEFAULT_PORT = 7001;
+    private final InMemoryUserRepository repository = new InMemoryUserRepository();
     private Javalin server;
 
     public static void main(String[] args) {
@@ -33,7 +33,6 @@ public class UserService {
     }
 
     private Javalin initHttpServer() {
-        InMemoryUserRepository repository = new InMemoryUserRepository();
 
         Javalin app = Javalin.create();
 
@@ -45,7 +44,7 @@ public class UserService {
 
         // GET user by ID
         app.get("/users/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            String id = ctx.pathParam("id");
 
             repository.findById(id).ifPresentOrElse(
                     ctx::json,
@@ -62,7 +61,7 @@ public class UserService {
 
         // PUT update user
         app.put("/users/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            String id = ctx.pathParam("id");
             UserData updatedUser = ctx.bodyAsClass(UserData.class);
             updatedUser.setId(id);
             repository.save(updatedUser);
@@ -71,7 +70,7 @@ public class UserService {
 
         // DELETE user
         app.delete("/users/{id}", ctx -> {
-            int id = Integer.parseInt(ctx.pathParam("id"));
+            String id = ctx.pathParam("id");
             boolean deleted = repository.deleteById(id);
             if (deleted) {
                 ctx.status(204);

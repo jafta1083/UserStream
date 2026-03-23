@@ -28,7 +28,7 @@ public class NotificationService {
     }
 
     private Javalin initHttpServer() {
-        InMemoryUserRepository repository = new InMemoryUserRepository();
+        InMemoryNotificationRepository repository = new InMemoryNotificationRepository();
 
         Javalin app = Javalin.create();
 

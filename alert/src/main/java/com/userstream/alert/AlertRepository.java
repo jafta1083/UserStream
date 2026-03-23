@@ -10,8 +10,6 @@ public interface AlertRepository {
 
     Optional<Alert> findById(int id);
 
-    Optional<Alert> findById(String id);
-
     List<Alert> findByUserId(int userId);
 
     List<Alert> findUnreadByUserId(int userId);

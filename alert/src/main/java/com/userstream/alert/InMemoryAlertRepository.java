@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class InMemoryAlertRepository implements AlertRepository {
+public class InMemoryAlertRepository implements AlertRepository {
     private final Map<Integer, Alert> alerts = new ConcurrentHashMap<>();
 
     @Override
@@ -17,7 +17,7 @@ public abstract class InMemoryAlertRepository implements AlertRepository {
     }
 
     @Override
-    public Optional<Alert> findById(String id) {
+    public Optional<Alert> findById(int id) {
         return Optional.ofNullable(alerts.get(id));
     }
 

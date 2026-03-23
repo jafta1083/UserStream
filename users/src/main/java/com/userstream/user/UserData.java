@@ -3,7 +3,7 @@ package com.userstream.user;
 import java.time.LocalDateTime;
 
 public class UserData {
-    private int id;
+    private String id;
     private String name;
     private String surname;
     private String email;
@@ -14,7 +14,7 @@ public class UserData {
     public UserData() {
     }
 
-    public UserData(int id, String name, String surname, String email) {
+    public UserData(String id, String name, String surname, String email) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -24,11 +24,11 @@ public class UserData {
         this.active = true;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

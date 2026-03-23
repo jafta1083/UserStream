@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface UserRepository {
     UserData save(UserData user);
 
-    Optional<UserData> findById(int id);
+    Optional<UserData> findById(String id);
 
     Optional<UserData> findByUsername(String username);
 
@@ -16,5 +16,5 @@ public interface UserRepository {
 
     List<UserData> findAll();
 
-    boolean deleteById(int id);
+    boolean deleteById(String id);
 }
