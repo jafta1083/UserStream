@@ -1,323 +1,286 @@
 # UserStream
+UserStream is an event-driven microservices system that collects user registration data via a frontend,
+processes it through message queues, stores it in a SQL database, generates CSV reports, logs activities,
+and sends notifications using independent backend services.
 
-UserStream is an event-driven microservices system that collects user registration data via a frontend, processes it through message queues, stores it in a SQL database, generates CSV reports, logs activities, and sends notifications using independent backend services.
+## Project Structure
 
-## Overview
+```
+UserStream/
+├── web/          # Main web API (Javalin) - Port 7070
+├── users/        # User management service - Port 7000
+├── events/       # Event processing service - Port 7001
+├── reports/      # Report generation service - Port 7002
+├── notification/ # Notification service - Port 7003
+├── alert/        # Alert service - Port 7004
+└── common/       # Shared utilities and database config
+```
 
-This project demonstrates a modern microservices architecture with five independent services working together to handle user registration and reporting workflows.
+## Tech Stack
 
-## Architecture
+- **Java 21**
+- **Maven** (multi-module project)
+- **Javalin 5.6.3** - Web framework
+- **Jackson 2.15.0** - JSON serialization
+- **ActiveMQ 5.17.2** - Message queue
+- **SQLite** - Database
 
-The system consists of five microservices:
-
-1. **Frontend Service** - Web application for collecting user data (name, surname, email)
-2. **Queue Receiver Service** - Consumes messages from the queue and routes them to appropriate services
-3. **Sender Service** - Handles email notifications and communications
-4. **Database Service** - Manages data persistence and retrieval operations
-5. **Report Generator Service** - Generates CSV reports from stored user data
-
-## Quick Start
+## Getting Started
 
 ### Prerequisites
+- Java 21+
+- Maven 3.8+
 
-- Docker and Docker Compose
-- Git
-
-### Running the Application
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/jafta1083/UserStream.git
-   cd UserStream
-   ```
-
-2. **Configure environment variables:**
-   ```bash
-   cp .env.template .env
-   # Edit .env with your SMTP credentials and other settings
-   ```
-
-3. **Start all services:**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Access the application:**
-   - Frontend: http://localhost:3000
-   - RabbitMQ Management: http://localhost:15672 (admin/admin123)
-   - Database Service API: http://localhost:8083
-   - Report Generator API: http://localhost:8084
-
-## System Components
-
-### Infrastructure
-- **Message Queue:** RabbitMQ (ports 5672, 15672)
-- **Database:** PostgreSQL (port 5432)
-- **Services:** 5 microservices (ports 3000, 8081-8084)
-
-### Data Flow
-```
-User Input → Frontend → Message Queue → Queue Receiver
-                                           ↓
-                                    Database Service
-                                      ↓         ↓
-                              Sender Service   Report Generator
-                             (Email)          (CSV Reports)
-```
-
-## Service Details
-
-| Service | Port | Description |
-|---------|------|-------------|
-| **Frontend** | 3000 | User-facing web application for data collection |
-| **Queue Receiver** | 8081 | Processes messages from the queue |
-| **Sender** | 8082 | Sends email notifications |
-| **Database Service** | 8083 | Handles data persistence (SQL) |
-| **Report Generator** | 8084 | Generates CSV reports |
-
-## Features
-
-- ✅ User registration with validation
-- ✅ Event-driven architecture with message queues
-- ✅ Asynchronous message processing
-- ✅ Email notifications
-- ✅ CSV report generation
-- ✅ RESTful APIs
-- ✅ Docker containerization
-- ✅ Health checks and monitoring
-- ✅ Scalable microservices design
-
-## Documentation
-
-- [**ARCHITECTURE.md**](ARCHITECTURE.md) - Detailed system architecture and design
-- [**PROJECT_STRUCTURE.md**](PROJECT_STRUCTURE.md) - Complete directory structure and file organization
-- [**services/*/README.md**](services/) - Individual service documentation
-
-## Development
-
-### Building Individual Services
-
+### Build
 ```bash
-# Build a specific service
-docker-compose build frontend
-
-# Rebuild and restart a service
-docker-compose up -d --build queue-receiver
+mvn clean install -DskipTests
 ```
 
-### Viewing Logs
-
+### Run
 ```bash
-# All services
-docker-compose logs -f
-
-# Specific service
-docker-compose logs -f database-service
+mvn exec:java -pl web
 ```
 
-### Running Tests
+The API will start on `http://localhost:7070`
 
-```bash
-# Run tests for a specific service
-docker-compose exec queue-receiver npm test
-```
+## API Endpoints
 
-### Stopping Services
-
-```bash
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes
-docker-compose down -v
-```
-
-## API Examples
-
-### Submit User Registration (Frontend → Queue)
-```javascript
-POST /api/submit
-{
-  "name": "John",
-  "surname": "Doe",
-  "email": "john.doe@example.com"
-}
-```
-
-### Store User Data (Database Service)
-```bash
-curl -X POST http://localhost:8083/api/users \
-  -H "Content-Type: application/json" \
-  -d '{"name":"John","surname":"Doe","email":"john.doe@example.com"}'
-```
-
-### Generate CSV Report (Report Generator)
-```bash
-curl -X POST http://localhost:8084/api/reports/generate \
-  -H "Content-Type: application/json" \
-  -d '{"startDate":"2025-01-01","endDate":"2025-12-31"}'
-```
-
-### Download Report
-```bash
-curl http://localhost:8084/api/reports/{reportId}/download -o users.csv
-```
-
-## Database Schema
-
-```sql
--- Users table
-CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    surname VARCHAR(100) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Notification logs
-CREATE TABLE notification_logs (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    notification_type VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
--- Report logs
-CREATE TABLE report_logs (
-    id BIGSERIAL PRIMARY KEY,
-    report_name VARCHAR(255) NOT NULL,
-    generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    record_count INT NOT NULL,
-    file_path VARCHAR(500),
-    status VARCHAR(50) NOT NULL
-);
-```
-
-## Configuration
-
-### Environment Variables
-
-Key configuration options in `.env`:
-
-```env
-# SMTP Configuration (Sender Service)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@example.com
-SMTP_PASSWORD=your-app-password
-
-# Database Configuration
-POSTGRES_DB=userstream
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres123
-
-# RabbitMQ Configuration
-RABBITMQ_DEFAULT_USER=admin
-RABBITMQ_DEFAULT_PASS=admin123
-```
-
-## Monitoring
-
-### Health Checks
-
-Each service exposes a health check endpoint:
-```bash
-curl http://localhost:8081/health  # Queue Receiver
-curl http://localhost:8082/health  # Sender
-curl http://localhost:8083/health  # Database Service
-curl http://localhost:8084/health  # Report Generator
-```
-
-### RabbitMQ Management
-
-Access the RabbitMQ management interface at http://localhost:15672
-- Username: admin
-- Password: admin123
-
-## Scalability
-
-Each microservice can be scaled independently:
-
-```bash
-# Scale Queue Receiver to 3 instances
-docker-compose up -d --scale queue-receiver=3
-
-# Scale Report Generator to 2 instances
-docker-compose up -d --scale report-generator=2
-```
-
-## Security Considerations
-
-- Use environment variables for sensitive credentials
-- Enable TLS/SSL for production deployments
-- Implement authentication/authorization for APIs
-- Validate all user inputs
-- Use secure SMTP connections
-- Regularly update dependencies
-
-## Troubleshooting
-
-### Service Won't Start
-```bash
-docker-compose logs [service-name]
-```
-
-### Database Connection Issues
-```bash
-docker-compose exec postgres psql -U postgres -d userstream
-```
-
-### Clear Message Queue
-Access RabbitMQ Management UI and purge queues manually
-
-### Reset Everything
-```bash
-docker-compose down -v
-docker-compose up -d
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-This project is licensed under the terms in the [LICENSE](LICENSE) file.
-
-## Support
-
-For issues and questions:
-- Create an issue on GitHub
-- Check the documentation in the `/services` directories
-- Review the ARCHITECTURE.md file
-
-## Technology Stack
-
-- **Frontend:** HTML/CSS/JavaScript (React/Vue/Angular)
-- **Backend:** Node.js/Java/Python
-- **Database:** PostgreSQL
-- **Message Queue:** RabbitMQ
-- **Containerization:** Docker & Docker Compose
-- **Email:** SMTP (Nodemailer/JavaMail/smtplib)
-
-## Roadmap
-
-- [ ] Add authentication and authorization
-- [ ] Implement API gateway
-- [ ] Add monitoring dashboard (Grafana)
-- [ ] Support for multiple report formats (PDF, Excel)
-- [ ] Real-time data streaming
-- [ ] Integration tests
-- [ ] CI/CD pipeline
-- [ ] Kubernetes deployment manifests
+### Quick Reference
+- `POST /user` - Register a new user
+- `GET /users` - Get all users
+- `GET /user/{id}` - Get user by ID
+- `DELETE /user/{id}` - Delete user
 
 ---
 
-**Note:** This is a demonstration project showcasing microservices architecture. Adapt it to your specific production requirements.
+## CURL Examples
+
+### Web Module (Port 7070) - Main API Gateway
+
+#### Health Check
+```bash
+curl http://localhost:7070/health
+```
+
+#### Users (via API Gateway)
+```bash
+# Get all users
+curl http://localhost:7070/api/users
+
+# Create a new user
+curl -X POST http://localhost:7070/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John","surname":"Doe","email":"john@example.com"}'
+```
+
+#### Reports (via API Gateway)
+```bash
+# Get dashboard report
+curl http://localhost:7070/api/reports/dashboard
+
+# Get status report
+curl http://localhost:7070/api/reports/status
+```
+
+#### Web Requests
+```bash
+# Get all requests
+curl http://localhost:7070/requests
+
+# Get request by ID
+curl http://localhost:7070/requests/1
+
+# Create a request
+curl -X POST http://localhost:7070/requests \
+  -H "Content-Type: application/json" \
+  -d '{"type":"registration","data":"sample"}'
+
+# Delete a request
+curl -X DELETE http://localhost:7070/requests/1
+```
+
+---
+
+### Users Module (Port 7000)
+
+```bash
+# Get all users
+curl http://localhost:7000/users
+
+# Get user by ID
+curl http://localhost:7000/users/abc123-uuid
+
+# Create a user
+curl -X POST http://localhost:7000/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Jane","surname":"Smith","email":"jane@example.com"}'
+
+# Update a user
+curl -X PUT http://localhost:7000/users/abc123-uuid \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Jane","surname":"Johnson","email":"jane.johnson@example.com"}'
+
+# Delete a user
+curl -X DELETE http://localhost:7000/users/abc123-uuid
+```
+
+---
+
+### Events Module (Port 7001)
+
+```bash
+# Get all events
+curl http://localhost:7001/events
+
+# Get event by ID
+curl http://localhost:7001/events/1
+
+# Create an event
+curl -X POST http://localhost:7001/events \
+  -H "Content-Type: application/json" \
+  -d '{"type":"USER_REGISTERED","userId":"abc123-uuid","timestamp":"2026-01-27T10:00:00"}'
+```
+
+---
+
+### Reports Module (Port 7002)
+
+```bash
+# Get all reports
+curl http://localhost:7002/reports
+
+# Get report by ID
+curl http://localhost:7002/reports/1
+
+# Create a report
+curl -X POST http://localhost:7002/reports \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Monthly Report","type":"summary"}'
+
+# Get all user reports
+curl http://localhost:7002/reports/users
+
+# Create a user report
+curl -X POST http://localhost:7002/reports/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John","surname":"Doe","email":"john@example.com"}'
+
+# Get user reports as CSV
+curl http://localhost:7002/reports/users/csv
+
+# Generate CSV from data
+curl -X POST http://localhost:7002/reports/generate-csv \
+  -H "Content-Type: application/json" \
+  -d '[["Name","Email"],["John","john@example.com"],["Jane","jane@example.com"]]'
+```
+
+---
+
+### Notification Module (Port 7003)
+
+```bash
+# Get all notifications
+curl http://localhost:7003/notifications
+
+# Get notification by ID
+curl http://localhost:7003/notifications/1
+
+# Create a notification
+curl -X POST http://localhost:7003/notifications \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"abc123-uuid","message":"Welcome to UserStream!","type":"email"}'
+
+# Send a notification
+curl -X POST http://localhost:7003/notifications/1/send
+```
+
+---
+
+### Alert Module (Port 7004)
+
+```bash
+# Get all alerts
+curl http://localhost:7004/alerts
+
+# Get alert by ID
+curl http://localhost:7004/alerts/1
+
+# Create an alert
+curl -X POST http://localhost:7004/alerts \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"abc123-uuid","message":"New login detected","severity":"info"}'
+
+# Get alerts for a user
+curl http://localhost:7004/alerts/user/abc123-uuid
+
+# Get unread alerts for a user
+curl http://localhost:7004/alerts/user/abc123-uuid/unread
+
+# Mark alert as read
+curl -X POST http://localhost:7004/alerts/1/read
+
+# Mark all user alerts as read
+curl -X POST http://localhost:7004/alerts/user/abc123-uuid/read
+
+# Delete an alert
+curl -X DELETE http://localhost:7004/alerts/1
+```
+
+---
+
+## Running Individual Microservices
+
+Each module can be run independently:
+
+```bash
+# Run Users service on port 7000
+mvn exec:java -pl users
+
+# Run Events service on port 7001
+mvn exec:java -pl events
+
+# Run Reports service on port 7002
+mvn exec:java -pl reports
+
+# Run Notification service on port 7003
+mvn exec:java -pl notification
+
+# Run Alert service on port 7004
+mvn exec:java -pl alert
+
+# Run Web (main gateway) on port 7070
+mvn exec:java -pl web
+```
+
+## Changelog
+
+### January 2026 - Bug Fixes & Improvements
+
+#### Critical Fixes
+| Issue | Description | Solution |
+|-------|-------------|----------|
+| UUID Parsing Crash | `UserData.id` was `int`, causing UUID parse failures | Changed to `String` type |
+| Null Repositories | Services had uninitialized repositories causing NPE | Initialized all repositories |
+| Abstract Class Error | `InMemoryAlertRepository` was abstract, couldn't instantiate | Removed `abstract` keyword |
+| Circular Dependency | `common` module depended on `users` module | Refactored `DatabaseConfig` to remove user-specific code |
+| SQL Syntax Error | Malformed column definition in table creation | Fixed SQL syntax |
+
+#### Medium Priority Fixes
+| Issue | Description | Solution |
+|-------|-------------|----------|
+| Wrong Path Parameter | `AlertService` used `id` instead of `userId` | Fixed path parameter name |
+| Inconsistent ID Types | Mixed `int`/`String` ID types across codebase | Standardized to `String` |
+| Empty CSV Methods | `generateCSV()` methods returned empty strings | Implemented CSV generation logic |
+| Version Mismatch | Hardcoded Jackson version in web module | Inherited from parent POM |
+| Missing .gitignore | Build artifacts not ignored | Added `target/`, `.idea/`, `*.csv` |
+
+#### Code Quality Improvements
+| Issue | Description | Solution |
+|-------|-------------|----------|
+| Repository Naming | `InMemoryUserRepository` used in wrong modules | Renamed to proper names (`InMemoryEventRepository`, `InMemoryReportRepository`, `InMemoryNotificationRepository`) |
+| Database Operations | User DB operations in common module caused coupling | Created `DatabaseUserRepository` in users module |
+| SLF4J Conflicts | ActiveMQ logging conflicts | Excluded conflicting SLF4J bindings |
+
+## License
+
+See [LICENSE](LICENSE) for details.

@@ -1,0 +1,5 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "DockerRun.DisableDockerrc": true,
+    "java.compile.nullAnalysis.mode": "automatic"
+}
